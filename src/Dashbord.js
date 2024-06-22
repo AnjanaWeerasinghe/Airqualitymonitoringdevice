@@ -1,29 +1,25 @@
-// src/components/Dashboard.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Gauge from './Gauge';
 import GaugeChart from 'react-gauge-chart';
+import { database, ref, onValue } from './firebase';
 import './Dashbord.css';
 
 const TemperatureGauge = ({ value }) => {
   const labels = [];
-  const angleStep = 180 / (labels.length - 1); // Calculate angle step based on labels
+  const angleStep = 180 / (labels.length - 1);
 
   return (
     <div className="temperature-gauge">
       <div className="gauge-container">
         <GaugeChart
           id="temperature"
-          nrOfLevels={30} // Adjust to have more segments for better number positioning
+          nrOfLevels={30}
           colors={['#00FF00', '#FFBF00', '#FF0000']}
           arcWidth={0.3}
-          percent={value / 150}
+          percent={value / 100}
         />
-        <div className="gauge-title">
-          Temperature
-        </div>
-        <div className="gauge-value">
-          {value}°C
-        </div>
+        <div className="gauge-title">Temperature</div>
+        <div className="gauge-value">{value}°C</div>
         <div className="gauge-labels">
           {labels.map((label, i) => (
             <span
@@ -41,12 +37,39 @@ const TemperatureGauge = ({ value }) => {
 };
 
 const Dashboard = () => {
-  const [coValue, setCoValue] = useState(50);
-  const [no2Value, setNo2Value] = useState(30);
-  const [ch4Value, setCh4Value] = useState(70);
-  const [nh3Value, setNh3Value] = useState(40);
-  const [temperature, setTemperature] = useState(22.5);
-  const [dustValue, setDustValue] = useState(60);
+  const [coValue, setCoValue] = useState(0);
+  const [no2Value, setNo2Value] = useState(0);
+  const [ch4Value, setCh4Value] = useState(0);
+  const [nh3Value, setNh3Value] = useState(0);
+  const [temperature, setTemperature] = useState(0);
+  const [dustValue, setDustValue] = useState(0);
+
+  useEffect(() => {
+    const sensorDataRef = ref(database, 'Gas value/sensor_data');
+    
+    const fetchData = async () => {
+      try {
+        onValue(sensorDataRef, (snapshot) => {
+          const data = snapshot.val();
+          console.log('Fetched data:', data); // Add logging to see the raw data
+          if (data) {
+            setCoValue(data.CO || 0);
+            setNo2Value(data.NO2 || 0);
+            setCh4Value(data.CH4 || 0);
+            setNh3Value(data.NH3 || 0);
+            setTemperature(data.Temperature || 0);
+            setDustValue(data.Dust || 0);
+          } else {
+            console.log('No data available');
+          }
+        });
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <div className="dashboard">
