@@ -1,0 +1,51 @@
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.gauges-row {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.gauge-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px;
+  position: relative;
+}
+
+.gauge-title {
+  font-size: 1.2em;
+  margin-top: 10px;
+}
+
+.gauge-value {
+  font-size: 1em;
+  margin-top: 5px;
+}
+
+.temperature-gauge .gauge-labels {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.temperature-gauge .gauge-label {
+  position: absolute;
+  width: 20px;
+  text-align: center;
+  font-size: 0.8em;
+  transform-origin: bottom center;
+}
