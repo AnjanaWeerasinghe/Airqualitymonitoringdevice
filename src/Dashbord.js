@@ -47,28 +47,25 @@ const Dashboard = () => {
   useEffect(() => {
     const sensorDataRef = ref(database, 'Gas value/sensor_data');
     
-    const fetchData = async () => {
-      try {
-        onValue(sensorDataRef, (snapshot) => {
-          const data = snapshot.val();
-          console.log('Fetched data:', data); // Add logging to see the raw data
-          if (data) {
-            setCoValue(data.CO || 0);
-            setNo2Value(data.NO2 || 0);
-            setCh4Value(data.CH4 || 0);
-            setNh3Value(data.NH3 || 0);
-            setTemperature(data.Temperature || 0);
-            setDustValue(data.Dust || 0);
-          } else {
-            console.log('No data available');
-          }
-        });
-      } catch (error) {
-        console.error('Error fetching data:', error);
+    const unsubscribe = onValue(sensorDataRef, (snapshot) => {
+      const data = snapshot.val();
+      console.log('Fetched data:', data); // Log fetched data for debugging
+      if (data) {
+        setCoValue(data.CO || 0);
+        setNo2Value(data.NO2 || 0);
+        setCh4Value(data.CH4 || 0);
+        setNh3Value(data.NH3 || 0);
+        setTemperature(data.Temperature || 0);
+        setDustValue(data.Dust || 0);
+      } else {
+        console.log('No data available');
       }
-    };
+    }, (error) => {
+      console.error('Error fetching data:', error);
+    });
 
-    fetchData();
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
   }, []);
 
   return (
